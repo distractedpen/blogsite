@@ -1,0 +1,61 @@
+package components 
+
+import (
+	"time"
+	"github.com/distractedpen/blogsite/utils"
+)
+
+templ Nav() {
+	<nav class="navbar">
+		<div class="navbar-brand">
+			<a class="navbar-item" href="/">
+				<h3>Distracted Penguin's Blog</h3>
+			</a>
+			<div class="navbar-menu">
+				<div class="navbar-end">
+					<a class="navbar-item" href="#">Home</a>
+					<a class="navbar-item" href="#">About</a>
+				</div>
+			</div>
+		</div>
+	</nav>
+}
+
+templ Footer() {
+	<footer class="footer"><div class="content has-text-centered"><p>Footer</p></div></footer>
+}
+
+templ SearchBox() {
+	<div>
+		<span>Search</span>
+		<input type="text" placeholder="Search..."/>
+	</div>
+}
+
+templ ArticleList(articles []utils.Article) {
+	<section class="">
+		for _, article := range articles {
+			@ArticleCard(article)
+		}
+	</section>
+}
+
+templ ArticleCard(article utils.Article) {
+	<div class="card">
+		<div class="card-content">
+			<a href={ templ.SafeURL(article.ContentPath) }><h3 class="title">{ article.Title }</h3></a>
+		</div>
+		<div>
+			<span>{ article.DatePublished.Format(time.DateTime) }</span>
+			// helper function to get first few lines of content from file
+		</div>
+	</div>
+}
+
+templ Head(title string) {
+	<head>
+		<title>{ title }</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	</head>
+}

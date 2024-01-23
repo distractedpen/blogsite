@@ -1,0 +1,20 @@
+package pages
+
+import (
+	"github.com/distractedpen/blogsite/components"
+	"github.com/distractedpen/blogsite/utils"
+)
+
+templ IndexPage(articles []utils.Article) {
+	<html>
+		@components.Head("Distracted Penguin's Blog")
+		<body>
+			@components.Nav()
+			<main>
+				<h1 class="title is-large">Distracted Penguin's Blog</h1>
+				@components.ArticleList(articles)
+			</main>
+			@components.Footer()
+		</body>
+	</html>
+}
