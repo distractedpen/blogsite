@@ -20,75 +20,65 @@ import (
 
 //go:generate templ generate
 
-// TODO: Add a way to get the articles from the content folder
-var articles = []utils.Article{
-	{
-		Title:         "First Article",
-		DatePublished: time.Now(),
-		ContentPath:   "content/test/first-article",
-	},
-	{
-		Title:         "Second Article",
-		DatePublished: time.Now(),
-		ContentPath:   "content/test/second-article",
-	},
-}
-
 func unsafe(html string) templ.Component {
-    return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
-        _, err = io.WriteString(w, html)
-        return
-    })
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		_, err = io.WriteString(w, html)
+		return
+	})
 }
 
 func mdToHTML(md []byte) []byte {
-    // setup parser
-    extensions := parser.CommonExtensions | parser.Attributes | parser.AutoHeadingIDs
-    p := parser.NewWithExtensions(extensions)
-    doc := p.Parse(md)
+	// setup parser
+	extensions := parser.CommonExtensions | parser.Attributes | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extensions)
+	doc := p.Parse(md)
 
-    // create HTML
-    htmlFlags := html.CommonFlags | html.HrefTargetBlank
-    opts := html.RendererOptions{Flags: htmlFlags}
-    renderer := html.NewRenderer(opts)
+	// create HTML
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
 
-    return markdown.Render(doc, renderer)
+	return markdown.Render(doc, renderer)
 }
 
 func main() {
 
-    const contentRoot = "content"
+	const contentRoot = "content"
+	const contentURL = "/content/{category}/{article}"
 
 	r := mux.NewRouter()
 
-	r.Handle("/", templ.Handler(pages.IndexPage(articles)))
-	r.HandleFunc("/content/{category}/{article}", func(w http.ResponseWriter, r *http.Request) {
-        vars := mux.Vars(r)
-        category := vars["category"]
-        article := vars["article"]
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        articles := utils.GetArticles()
+        pages.IndexPage(articles).Render(context.Background(), w)
 
-        articlePath := path.Join(contentRoot, category, article)
+	})
+	r.HandleFunc(contentURL, func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		category := vars["category"]
+		article := vars["article"]
 
-        source, read_err := os.ReadFile(articlePath + ".md")
-        if read_err != nil {
-            log.Print(read_err)
-            pages.ErrorPage().Render(context.Background(), w)
-            return
-        }
-        html := mdToHTML(source)
+		articlePath := path.Join(contentRoot, category, article)
 
-        w.Header().Set("Content-Type", "text/html")
-        pages.ArticlePage(article, unsafe(string(html))).Render(context.Background(), w)
-    })
+		source, read_err := os.ReadFile(articlePath + ".md")
+		if read_err != nil {
+			log.Print(read_err)
+			pages.ErrorPage().Render(context.Background(), w)
+			return
+		}
+		html := mdToHTML(source)
 
+		w.Header().Set("Content-Type", "text/html")
+		pages.ArticlePage(article, unsafe(string(html))).Render(context.Background(), w)
+	})
 
-    http.Handle("/", r)
+	http.Handle("/", r)
 
-    srv := &http.Server{
-        Handler: r,
-        Addr: "127.0.0.1:8080",
-        WriteTimeout: 15 * time.Second,
-        ReadTimeout: 15 * time.Second,
-    }
-    log.Fatal(srv.ListenAndServe())
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         "127.0.0.1:8080",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	log.Fatal(srv.ListenAndServe())
 }
