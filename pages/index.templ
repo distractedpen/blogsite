@@ -10,10 +10,13 @@ templ IndexPage(articles []utils.Article) {
 		@components.Head("Distracted Penguin's Blog")
 		<body>
 			@components.Nav()
-			<main>
-				<h1 class="title is-large">Distracted Penguin's Blog</h1>
+            <div class="container fluid">
+                <h1 class="title is-large centered">Distracted Penguin's Blog</h1>
+            </div>
+			<aside>
 				@components.ArticleList(articles)
-			</main>
+			</aside>
+            <main id="articleContent"></main>
 			@components.Footer()
 		</body>
 	</html>

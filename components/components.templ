@@ -1,7 +1,6 @@
 package components 
 
 import (
-	"time"
 	"github.com/distractedpen/blogsite/utils"
 )
 
@@ -33,22 +32,21 @@ templ SearchBox() {
 }
 
 templ ArticleList(articles []utils.Article) {
-	<section class="">
-		for _, article := range articles {
-			@ArticleCard(article)
-		}
+	<section class="container">
+		<div class="tile is-ancestor">
+            <div class="tile is-4 is-vertical is-parent">
+                for _, article := range articles {
+                    @ArticleCard(article)
+                }
+            </div>
+        </div>
 	</section>
 }
 
 templ ArticleCard(article utils.Article) {
-	<div class="card">
-		<div class="card-content">
-			<a href={ templ.SafeURL(article.ContentPath) }><h3 class="title">{ article.Title }</h3></a>
-		</div>
-		<div>
-			<span>{ article.DatePublished.Format(time.DateTime) }</span>
-			// helper function to get first few lines of content from file
-		</div>
+	<div class="tile is-child box">
+        <a href={ templ.SafeURL(article.ContentPath) }><h3 class="title">{ article.Title }</h3></a>
+        <span>{ article.DatePublished.Format("Jan, 02 2006") }</span>
 	</div>
 }
 
