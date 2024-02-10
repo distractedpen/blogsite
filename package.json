@@ -1,0 +1,20 @@
+{
+  "name": "blogsite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+      "build": "tailwindcss build -o static/css/tailwind.css",
+      "watch": "tailwindcss build -o static/css/tailwind.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/distractedpen/blogsite.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/distractedpen/blogsite/issues"
+  },
+  "homepage": "https://github.com/distractedpen/blogsite#readme"
+}

@@ -19,6 +19,7 @@ import (
 )
 
 //go:generate templ generate
+//go:generate npm run build
 
 func unsafe(html string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
@@ -48,12 +49,17 @@ func main() {
 
 	r := mux.NewRouter()
 
+    fs := http.FileServer(http.Dir("./static/"))
+    r.Handle("/static/", http.StripPrefix("/static/", fs))
+
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        log.Print("root route: " + r.URL.Path)
         articles := utils.GetArticles()
         pages.IndexPage(articles).Render(context.Background(), w)
-
 	})
+
 	r.HandleFunc(contentURL, func(w http.ResponseWriter, r *http.Request) {
+        log.Print("content route: " + r.URL.Path)
 		vars := mux.Vars(r)
 		category := vars["category"]
 		article := vars["article"]
@@ -80,5 +86,6 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
+    log.Print("Server started on :8080")
 	log.Fatal(srv.ListenAndServe())
 }

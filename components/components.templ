@@ -5,15 +5,16 @@ import (
 )
 
 templ Nav() {
-	<nav class="navbar">
-		<div class="navbar-brand">
-			<a class="navbar-item" href="/">
-				<h3>Distracted Penguin's Blog</h3>
+	<nav class="">
+		<div class="">
+			<a class="" href="/">
+				<h1>Warm Igloo Blog</h1>
+                <h3>by Taylor Noble</h3>
 			</a>
-			<div class="navbar-menu">
-				<div class="navbar-end">
-					<a class="navbar-item" href="#">Home</a>
-					<a class="navbar-item" href="#">About</a>
+			<div class="">
+				<div class="">
+					<a class="" href="#">Resume</a>
+					<a class="" href="#">About</a>
 				</div>
 			</div>
 		</div>
@@ -21,7 +22,7 @@ templ Nav() {
 }
 
 templ Footer() {
-	<footer class="footer"><div class="content has-text-centered"><p>Footer</p></div></footer>
+	<footer class=""><div class=""><p>Footer</p></div></footer>
 }
 
 templ SearchBox() {
@@ -32,9 +33,9 @@ templ SearchBox() {
 }
 
 templ ArticleList(articles []utils.Article) {
-	<section class="container">
-		<div class="tile is-ancestor">
-            <div class="tile is-4 is-vertical is-parent">
+	<section class="">
+		<div class="">
+            <div class="">
                 for _, article := range articles {
                     @ArticleCard(article)
                 }
@@ -44,8 +45,8 @@ templ ArticleList(articles []utils.Article) {
 }
 
 templ ArticleCard(article utils.Article) {
-	<div class="tile is-child box">
-        <a href={ templ.SafeURL(article.ContentPath) }><h3 class="title">{ article.Title }</h3></a>
+	<div class="">
+        <a href={ templ.SafeURL(article.ContentPath) }><h3 class="">{ article.Title }</h3></a>
         <span>{ article.DatePublished.Format("Jan, 02 2006") }</span>
 	</div>
 }
@@ -53,7 +54,7 @@ templ ArticleCard(article utils.Article) {
 templ Head(title string) {
 	<head>
 		<title>{ title }</title>
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"/>
+		<link rel="stylesheet" href="css/tailwind.css"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	</head>
 }
