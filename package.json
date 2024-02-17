@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-      "build": "tailwindcss build -o static/css/tailwind.css",
-      "watch": "tailwindcss build -o static/css/tailwind.css --watch"
+    "build": "tailwindcss build -o static/css/tailwind.css",
+    "watch": "tailwindcss build -o static/css/tailwind.css --watch"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/distractedpen/blogsite/issues"
   },
-  "homepage": "https://github.com/distractedpen/blogsite#readme"
+  "homepage": "https://github.com/distractedpen/blogsite#readme",
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10"
+  }
 }

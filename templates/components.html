@@ -8,31 +8,32 @@
 
 {{define "nav"}}
 <nav class="flex items-center justify-between flex-wrap pl-4 pr-4">
-    <div class="flex flex-col item-center flex-shrink-0 text-white">
+    <div class="flex flex-col item-center flex-shrink-0 text-black">
         <p class="text-3xl">Taylor's Blog</p>
         <p class="text-xl">The thoughts of a simple developer.</p>
     </div>
     <div>
         <div class="flex flex-row lg:flex-grow">
-            <a href="#" class="p-2 text-white text-md hover:text-black hover:bg-gray-500">About</a>
-            <a href="#" class="p-2 text-white text-md hover:text-black hover:bg-gray-500">Resume</a>
-            <a href="." class="p-2 text-white text-md hover:text-black hover:bg-gray-500">Articles</a>
+            <a href="#" class="p-2 text-black text-md hover:text-white hover:bg-gray-500">About</a>
+            <a href="#" class="p-2 text-black text-md hover:text-white hover:bg-gray-500">Resume</a>
+            <a href="/" class="p-2 text-black text-md hover:text-white hover:bg-gray-500">Articles</a>
         </div>
     </div>
 </nav>
+<hr class="border-b border-solid border-black mb-12"/>
 {{end}}
 
 {{define "contentlist"}}
-<div class="flex flex-row flex-wrap">
+<div class="flex flex-row flex-wrap justify-center">
     {{ range .Articles }}
-    <div class="bg-gray-400 flex flex-col mb-6 ml-6 basis-2/5">
+    <div class="bg-gray-400 flex flex-col mb-6 basis-3/5">
         <div class="flex-shrink-0 mb-2 pl-2 pt-2">
-            <h1 class="text-2xl">{{.Title}}</h1>
-            <span class="text-sm text-gray-50">{{.DatePublished}}</span>
+            <h1 class="text-5xl">{{.Title}}</h1>
+            <p class="text-md text-right mr-2 text-gray-100">{{.DatePublished}}</p>
         </div>
         <hr class="border-b border-solid border-black "/>
-        <div class="flex-grow max-w-prose mt-2 pl-2">
-            <p>
+        <div class="grow flex justify-center mt-2">
+            <p class="max-w-3xl">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus a pellentesque sit amet. Consectetur a erat nam at lectus urna. Ut morbi tincidunt augue interdum velit euismod in pellentesque massa. Massa tincidunt nunc pulvinar sapien et ligula ullamcorper. Tortor dignissim convallis aenean et tortor at risus viverra. Adipiscing tristique risus nec feugiat in fermentum posuere. Velit egestas dui id ornare arcu odio. Hendrerit gravida rutrum quisque non tellus. Tincidunt augue interdum velit euismod in pellentesque massa placerat. Faucibus vitae aliquet nec ullamcorper. Nunc non blandit massa enim nec dui nunc mattis enim. Lorem sed risus ultricies tristique nulla aliquet enim. Ultricies tristique nulla aliquet enim tortor at. Morbi quis commodo odio aenean sed adipiscing. In eu mi bibendum neque egestas congue quisque. Et ligula ullamcorper malesuada proin libero nunc consequat. Viverra mauris in aliquam sem fringilla.
                 <a href={{.ContentPath}} class="block text-md text-center p-2 m-2 bg-black text-white">Read More</a>
             </p>
