@@ -1,84 +1,104 @@
 package main
 
 import (
-	"context"
-	"io"
 	"log"
+    "os"
+    "path"
 	"net/http"
-	"os"
-	"path"
+    "html/template"
 	"time"
 
-	"github.com/a-h/templ"
-	"github.com/distractedpen/blogsite/pages"
-	"github.com/distractedpen/blogsite/utils"
+    "github.com/distractedpen/blogsite/utils"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
-	"github.com/gorilla/mux"
 )
 
-//go:generate templ generate
 //go:generate npm run build
 
-func unsafe(html string) templ.Component {
-	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
-		_, err = io.WriteString(w, html)
-		return
-	})
+func mdToHTML(source []byte) string{
+    // setup parser
+    extensions := parser.CommonExtensions | parser.Attributes | parser.AutoHeadingIDs
+    p := parser.NewWithExtensions(extensions)
+    doc := p.Parse(source)
+
+    // create HTML
+    htmlFlags := html.CommonFlags | html.HrefTargetBlank
+    opts := html.RendererOptions{Flags: htmlFlags}
+    renderer := html.NewRenderer(opts)
+
+    return string(markdown.Render(doc, renderer))
 }
 
-func mdToHTML(md []byte) []byte {
-	// setup parser
-	extensions := parser.CommonExtensions | parser.Attributes | parser.AutoHeadingIDs
-	p := parser.NewWithExtensions(extensions)
-	doc := p.Parse(md)
-
-	// create HTML
-	htmlFlags := html.CommonFlags | html.HrefTargetBlank
-	opts := html.RendererOptions{Flags: htmlFlags}
-	renderer := html.NewRenderer(opts)
-
-	return markdown.Render(doc, renderer)
+func check(err error) {
+    if err != nil {
+        log.Panic(err)
+    }
 }
 
 func main() {
 
 	const contentRoot = "content"
-	const contentURL = "/content/{category}/{article}"
 
-	r := mux.NewRouter()
+    indexTemplateList := []string{
+        "./templates/index.html",
+        "./templates/components.html",
+    }
+
+    articleTemplateList := []string{
+        "./templates/article.html",
+        "./templates/components.html",
+    }
+
+
+    indexTemplates, err := template.ParseFiles(indexTemplateList...)
+    check(err)
+
+    articleTemplates, err := template.New("article.html").Funcs(template.FuncMap{
+    }).ParseFiles(articleTemplateList...)
+
+    log.Println(articleTemplates.DefinedTemplates())
+
+	r := http.NewServeMux()
+
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        log.Print("root route: " + r.URL.Path)
+        articleList := utils.ArticleList{ Articles: utils.GetArticles() }
+        err := indexTemplates.Execute(w, articleList) 
+        check(err)
+	})
 
     fs := http.FileServer(http.Dir("./static/"))
     r.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        log.Print("root route: " + r.URL.Path)
-        articles := utils.GetArticles()
-        pages.IndexPage(articles).Render(context.Background(), w)
-	})
 
-	r.HandleFunc(contentURL, func(w http.ResponseWriter, r *http.Request) {
-        log.Print("content route: " + r.URL.Path)
-		vars := mux.Vars(r)
-		category := vars["category"]
-		article := vars["article"]
+	r.HandleFunc("/content/{category}/{article}", func(w http.ResponseWriter, r *http.Request) {
+        category := r.PathValue("category")
+        articleTitle := r.PathValue("article")
 
-		articlePath := path.Join(contentRoot, category, article)
+		articlePath := path.Join(contentRoot, category, articleTitle)
 
 		source, read_err := os.ReadFile(articlePath + ".md")
 		if read_err != nil {
 			log.Print(read_err)
-			pages.ErrorPage().Render(context.Background(), w)
+            http.Error(w, "Page not Found.", http.StatusInternalServerError)
 			return
 		}
-		html := mdToHTML(source)
 
-		w.Header().Set("Content-Type", "text/html")
-		pages.ArticlePage(article, unsafe(string(html))).Render(context.Background(), w)
+        htmlContent := mdToHTML(source)
+        article := utils.GetArticle(articlePath)
+
+        articleContent := map[string]interface{}{
+            "Title": article.Title,
+            "DatePublished": article.DatePublished,
+            "Content": template.HTML(htmlContent),
+        }
+
+        err := articleTemplates.Execute(w, articleContent)
+        if (err != nil) {
+            log.Panic(err)
+        }
 	})
-
-	http.Handle("/", r)
 
 	srv := &http.Server{
 		Handler:      r,

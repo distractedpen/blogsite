@@ -14,6 +14,18 @@ type Article struct {
 	ContentPath   string
 }
 
+type ArticleList struct {
+	Articles []Article
+}
+
+type ArticleContent struct {
+	Article Article
+	Content []byte
+}
+
+func GetArticle(path string) Article {
+	return buildArticle(path)
+}
 
 func GetArticles() []Article {
 
@@ -31,39 +43,41 @@ func GetArticles() []Article {
 				return nil
 			}
 
-			rawFileName := info.Name()
-			// Name Pattern: [date]_[title].md
-			// Example: 2021-01-01_First-Article.md
-			noExt, _ := strings.CutSuffix(rawFileName, ".md")
-            pathNoExt, _ := strings.CutSuffix(path, ".md")
-			parts := strings.Split(noExt, "_")
-
-			if len(parts) != 2 {
-				log.Printf("Invalid file name: %s", rawFileName)
-				return nil
-			}
-
-			dateStr := parts[0]
-			dateVal, err := time.Parse("2006-01-02", dateStr)
-			if err != nil {
-				log.Printf("Invalid date format: %s", dateStr)
-				dateVal = time.Now()
-				return nil
-			}
-			title := parts[1]
-
-			article := Article{
-				Title:         title,
-				DatePublished: dateVal,
-				ContentPath:   pathNoExt,
-			}
+            article := buildArticle(path)
 			articles = append(articles, article)
 			return nil
 		})
 
-    if err != nil {
-        log.Fatal(err)
-    }
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return articles
 }
+
+func buildArticle(path string) Article {
+	// Name Pattern: [date]_[title].md
+	// Example: 2021-01-01_First-Article.md
+	splitPath := strings.Split(path, "/")
+	fileName := splitPath[len(splitPath)-1]
+
+	noExt, _ := strings.CutSuffix(fileName, ".md")
+	pathNoExt, _ := strings.CutSuffix(path, ".md")
+	parts := strings.Split(noExt, "_")
+
+	dateStr := parts[0]
+	dateVal, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		log.Printf("Invalid date format: %s", dateStr)
+		dateVal = time.Now()
+	}
+
+	title := parts[1]
+
+	return Article{
+		Title:         title,
+		DatePublished: dateVal,
+		ContentPath:   pathNoExt,
+	}
+}
+
