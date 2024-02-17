@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang='en'>
+{{ template "head" .}}
+<body class="bg-gray-300">
+    {{ template "nav" .}}
+    <hr class="border-b border-solid border-black"/>
+    <main>
+        <h1>{{ .Title }}</h1>
+        <h3>{{ .DatePublished }}</h3>
+        <div>{{ .Content }}</div>
+    </main>
+</body>
+</html>
