@@ -1,3 +1,4 @@
+node_modules/
 content/*
 pages/*.go
 components/*.go
