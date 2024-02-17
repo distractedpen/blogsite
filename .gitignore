@@ -1,7 +1,6 @@
 content/*
 pages/*.go
 components/*.go
-go.sum
 *.sublime-project
 *.sublime-workspace
 blogsite
