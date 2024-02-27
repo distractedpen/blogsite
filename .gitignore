@@ -1,7 +1,8 @@
 node_modules/
-content/*
-pages/*.go
-components/*.go
+metadata/
+public/
+static/    
+content/
 *.sublime-project
 *.sublime-workspace
 blogsite

@@ -2,7 +2,7 @@
 <head>
     <meta charset='utf-8'>
     <title>Taylor's Blog</title>
-    <link rel='stylesheet' type='text/css' href='/static/css/tailwind.css'/>
+    <link rel='stylesheet' type='text/css' href='/static/css/build.css'/>
 </head>
 {{end}}
 
@@ -25,17 +25,17 @@
 
 {{define "contentlist"}}
 <div class="flex flex-row flex-wrap justify-center">
-    {{ range .Articles }}
+    {{ range .}}
     <div class="bg-gray-400 flex flex-col mb-6 basis-3/5">
         <div class="flex-shrink-0 mb-2 pl-2 pt-2">
-            <h1 class="text-5xl">{{.Title}}</h1>
-            <p class="text-md text-right mr-2 text-gray-100">{{.DatePublished}}</p>
+            <h1 class="text-5xl">{{.ArticleMetadata.Title}}</h1>
+            <p class="text-md text-right mr-2 text-gray-100">{{.ArticleMetadata.DatePublished}}</p>
         </div>
         <hr class="border-b border-solid border-black "/>
         <div class="grow flex justify-center mt-2">
             <p class="max-w-3xl">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus a pellentesque sit amet. Consectetur a erat nam at lectus urna. Ut morbi tincidunt augue interdum velit euismod in pellentesque massa. Massa tincidunt nunc pulvinar sapien et ligula ullamcorper. Tortor dignissim convallis aenean et tortor at risus viverra. Adipiscing tristique risus nec feugiat in fermentum posuere. Velit egestas dui id ornare arcu odio. Hendrerit gravida rutrum quisque non tellus. Tincidunt augue interdum velit euismod in pellentesque massa placerat. Faucibus vitae aliquet nec ullamcorper. Nunc non blandit massa enim nec dui nunc mattis enim. Lorem sed risus ultricies tristique nulla aliquet enim. Ultricies tristique nulla aliquet enim tortor at. Morbi quis commodo odio aenean sed adipiscing. In eu mi bibendum neque egestas congue quisque. Et ligula ullamcorper malesuada proin libero nunc consequat. Viverra mauris in aliquam sem fringilla.
-                <a href={{.ContentPath}} class="block text-md text-center p-2 m-2 bg-black text-white">Read More</a>
+                {{.ArticleMetadata.Abstract}}
+                <a href={{.Path}} class="block text-md text-center p-2 m-2 bg-black text-white">Read More</a>
             </p>
         </div>
     </div>

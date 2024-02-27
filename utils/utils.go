@@ -1,17 +1,24 @@
 package utils
 
 import (
-	"log"
+	"gopkg.in/yaml.v2"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
 )
 
+type ArticleMetadata struct {
+	Title         string    `yaml:"title"`
+	DatePublished time.Time `yaml:"datePublished"`
+	Abstract      string    `yaml:"abstract"`
+	Tags          []string  `yaml:"tags"`
+}
+
 type Article struct {
-	Title         string
-	DatePublished time.Time
-	ContentPath   string
+	ArticleMetadata ArticleMetadata
+	Path            string
 }
 
 type ArticleList struct {
@@ -23,61 +30,48 @@ type ArticleContent struct {
 	Content []byte
 }
 
-func GetArticle(path string) Article {
-	return buildArticle(path)
+func GetArticle(fpath string) Article {
+	// read the file and return the article object
+
+	var metadataPath string
+	if !strings.HasPrefix(fpath, "metadata") {
+        metadataPath = path.Join("metadata", strings.TrimSuffix(strings.TrimPrefix(fpath, "content/"), ".md")+".yml")
+	} else {
+		metadataPath = fpath
+	}
+
+	articleMetadata, read_err := os.ReadFile(metadataPath)
+	if read_err != nil {
+		panic(read_err)
+	}
+	var metadata ArticleMetadata
+	yaml_err := yaml.Unmarshal(articleMetadata, &metadata)
+	if yaml_err != nil {
+		panic(yaml_err)
+	}
+
+	return Article{
+		ArticleMetadata: metadata,
+		Path: strings.TrimPrefix(strings.Replace(fpath, "yml", "html", 1), "metadata"),
+	}
 }
 
 func GetArticles() []Article {
-
-	articles := make([]Article, 0)
-
+	var articles []Article
 	// Read the content folder and generate list of article objects
-
-	err := filepath.Walk("content",
+	err := filepath.Walk("metadata",
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
-
-			if info.IsDir() {
-				return nil
-			}
-
-            article := buildArticle(path)
+			article := GetArticle(path)
 			articles = append(articles, article)
 			return nil
 		})
 
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	return articles
 }
-
-func buildArticle(path string) Article {
-	// Name Pattern: [date]_[title].md
-	// Example: 2021-01-01_First-Article.md
-	splitPath := strings.Split(path, "/")
-	fileName := splitPath[len(splitPath)-1]
-
-	noExt, _ := strings.CutSuffix(fileName, ".md")
-	pathNoExt, _ := strings.CutSuffix(path, ".md")
-	parts := strings.Split(noExt, "_")
-
-	dateStr := parts[0]
-	dateVal, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		log.Printf("Invalid date format: %s", dateStr)
-		dateVal = time.Now()
-	}
-
-	title := parts[1]
-
-	return Article{
-		Title:         title,
-		DatePublished: dateVal,
-		ContentPath:   pathNoExt,
-	}
-}
-
